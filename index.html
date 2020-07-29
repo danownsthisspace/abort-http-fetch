@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/papercss@1.6.1/dist/paper.min.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="row flex-center margin-top-large">
+        <div>
+            <button id="fetch-users-button" class="btn-secondary margin">👨‍👩‍👧‍👧 Fetch Users</button>
+            <button id="cancel-fetch-users-button" class="btn-danger margin">🛑 Cancel Fetch Users</button>
+                <h2 id="fetch-status"></h2>
+                <ul id="users-list"></ul>
+            </div>
+      </div>
+    
+
+    <script>
+        const fetchUsersBtn = document.getElementById("fetch-users-button")
+        const cancelFetchUsersBtn = document.getElementById("cancel-fetch-users-button")
+        const fetchStatus = document.getElementById("fetch-status")
+        const usersList = document.getElementById("users-list")
+
+        let abortController = new AbortController()
+
+        cancelFetchUsersBtn.addEventListener('click', () => {
+            fetchStatus.innerHTML = "Aborted 🔥"
+            abortController.abort()
+        })
+
+        fetchUsersBtn.addEventListener('click', () => {
+            usersList.innerHTML = ''
+            fetchStatus.innerHTML = "fetching Users..."
+            const fetchOptions = {
+                signal: abortController.signal
+            }
+            fetch("https://reqres.in/api/users?delay=1", fetchOptions)
+            .then(resp => {
+                resp.json().then((({data}) => {
+                    fetchStatus.innerHTML = "fetched"
+                    data.map(({email}) => {
+                        const listItem = document.createElement("li")
+                        const text = document.createTextNode(email)
+                        listItem.appendChild(text)
+                        usersList.appendChild(listItem)
+                    })
+                }))
+            })
+            .catch(err => console.log("Err", err))
+        })
+
+
+    </script>
+
+
+</body>
+</html>
